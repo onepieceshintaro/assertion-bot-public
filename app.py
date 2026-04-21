@@ -24,7 +24,7 @@ from reports import current_week_range, filter_week, generate_weekly_report
 from _user import render_account_sidebar
 
 st.set_page_config(
-    page_title="アサーション練習",
+    page_title="伝え方ノート",
     page_icon="🗣",
     layout="wide",
 )
@@ -226,7 +226,7 @@ with st.sidebar:
 # 対話ビュー
 # ----------------------------------------------------------------------------
 if view == "💬 対話":
-    st.markdown("### アサーション練習")
+    st.markdown("### 伝え方ノート")
     st.caption("自分も相手も大切にする伝え方を、一緒に考えていきます。")
 
     # いつの出来事か
