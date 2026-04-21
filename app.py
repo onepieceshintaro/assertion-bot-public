@@ -105,6 +105,12 @@ def reset_session():
 # サイドバー
 # ----------------------------------------------------------------------------
 with st.sidebar:
+    st.link_button(
+        "🏠 Hub に戻る",
+        "https://app-public-qpy8b2ziwgdf9h2vmu5hqp.streamlit.app/",
+        use_container_width=True,
+    )
+    st.divider()
     view = st.radio(
         "表示",
         ["💬 対話", "📊 傾向を見る", "📝 週次レポート", "📖 過去の記録"],
