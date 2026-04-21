@@ -523,11 +523,10 @@ elif view == "📊 傾向を見る":
     if df.empty:
         st.info("まだ記録がありません。左側の「💬 対話」から始めてください。")
     else:
-        df["event_datetime"] = pd.to_datetime(
-            df["event_datetime"].fillna(df["created_at"]),
-            format="mixed",
-            errors="coerce",
-        )
+        _ev = pd.to_datetime(df["event_datetime"], errors="coerce")
+        _cr = pd.to_datetime(df["created_at"], errors="coerce")
+        df["event_datetime"] = _ev.fillna(_cr)
+        df = df.dropna(subset=["event_datetime"])
 
         # 相手ごとの分布
         st.subheader("👥 相手との関係別")
@@ -626,11 +625,10 @@ elif view == "📝 週次レポート":
 
     df_all = load_records()
     if not df_all.empty:
-        df_all["event_datetime"] = pd.to_datetime(
-            df_all["event_datetime"].fillna(df_all["created_at"]),
-            format="mixed",
-            errors="coerce",
-        )
+        _ev = pd.to_datetime(df_all["event_datetime"], errors="coerce")
+        _cr = pd.to_datetime(df_all["created_at"], errors="coerce")
+        df_all["event_datetime"] = _ev.fillna(_cr)
+        df_all = df_all.dropna(subset=["event_datetime"])
 
     week_start, week_end = current_week_range()
     st.subheader(f"📅 今週（{week_start.strftime('%m/%d')}〜{week_end.strftime('%m/%d')}）")
@@ -684,11 +682,10 @@ elif view == "📖 過去の記録":
     if df.empty:
         st.info("まだ記録がありません。")
     else:
-        df["event_datetime"] = pd.to_datetime(
-            df["event_datetime"].fillna(df["created_at"]),
-            format="mixed",
-            errors="coerce",
-        )
+        _ev = pd.to_datetime(df["event_datetime"], errors="coerce")
+        _cr = pd.to_datetime(df["created_at"], errors="coerce")
+        df["event_datetime"] = _ev.fillna(_cr)
+        df = df.dropna(subset=["event_datetime"])
         recent = df.sort_values("event_datetime", ascending=False)
 
         for _, row in recent.iterrows():
