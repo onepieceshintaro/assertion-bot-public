@@ -524,7 +524,9 @@ elif view == "📊 傾向を見る":
         st.info("まだ記録がありません。左側の「💬 対話」から始めてください。")
     else:
         df["event_datetime"] = pd.to_datetime(
-            df["event_datetime"].fillna(df["created_at"])
+            df["event_datetime"].fillna(df["created_at"]),
+            format="mixed",
+            errors="coerce",
         )
 
         # 相手ごとの分布
@@ -625,7 +627,9 @@ elif view == "📝 週次レポート":
     df_all = load_records()
     if not df_all.empty:
         df_all["event_datetime"] = pd.to_datetime(
-            df_all["event_datetime"].fillna(df_all["created_at"])
+            df_all["event_datetime"].fillna(df_all["created_at"]),
+            format="mixed",
+            errors="coerce",
         )
 
     week_start, week_end = current_week_range()
@@ -681,7 +685,9 @@ elif view == "📖 過去の記録":
         st.info("まだ記録がありません。")
     else:
         df["event_datetime"] = pd.to_datetime(
-            df["event_datetime"].fillna(df["created_at"])
+            df["event_datetime"].fillna(df["created_at"]),
+            format="mixed",
+            errors="coerce",
         )
         recent = df.sort_values("event_datetime", ascending=False)
 
