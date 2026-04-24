@@ -311,7 +311,7 @@ if view == "💬 対話":
         st.markdown("### ✍ セリフを考える")
         st.caption(
             "ここまでの内容から、アサーティブなセリフの案をAIに3つ出してもらえます。"
-            "自分で考えてもOK。**押さない選択も肯定されます**。"
+            "自分で考えてもOK。"
         )
         c1, c2 = st.columns([1, 1])
         with c1:
@@ -379,7 +379,26 @@ if view == "💬 対話":
                         key=f"choose_{i}",
                     ):
                         st.session_state.chosen_script_idx = i
-                        st.success(f"案{i+1}（{label}）を採用しました。")
+                        # 採用したら自動で次フェーズ（todo_insight）へ進める
+                        adopt_msg = (
+                            f"案{i+1}（{label}）を採用します。"
+                            "次のステップ（TODOと気づき）に進んでください。"
+                        )
+                        st.session_state.messages.append(
+                            {"role": "user", "content": adopt_msg}
+                        )
+                        with st.spinner("次のステップへ進んでいます..."):
+                            raw_reply = chat(
+                                st.session_state.messages,
+                                mode=st.session_state.mode,
+                            )
+                        st.session_state.messages.append(
+                            {"role": "assistant", "content": raw_reply}
+                        )
+                        new_phase = parse_phase(raw_reply)
+                        if new_phase:
+                            st.session_state.current_phase = new_phase
+                        st.rerun()
 
             st.caption(
                 "**自分の言葉に置き換えて使うのが一番効果的**です。"
@@ -623,9 +642,33 @@ elif view == "📊 傾向を見る":
                     st.markdown(f"### {diag.get('tendency_label', '')}")
                     scores = diag.get("scores", {})
                     c1, c2, c3 = st.columns(3)
-                    c1.metric("非主張スコア", f"{scores.get('non_assertive', 0)}/10")
-                    c2.metric("バランススコア", f"{scores.get('assertive', 0)}/10")
-                    c3.metric("攻撃スコア", f"{scores.get('aggressive', 0)}/10")
+                    c1.metric(
+                        "ノンアサーティブ",
+                        f"{scores.get('non_assertive', 0)}/10",
+                        help="自分の意見を飲み込んで我慢する／言えない傾向",
+                    )
+                    c2.metric(
+                        "アサーティブ",
+                        f"{scores.get('assertive', 0)}/10",
+                        help="自分も相手も尊重して率直に伝えられている傾向",
+                    )
+                    c3.metric(
+                        "アグレッシブ",
+                        f"{scores.get('aggressive', 0)}/10",
+                        help="自分の要求を通すため、相手を責めたり傷つけたりする傾向",
+                    )
+                    with st.expander("💡 3つの自己表現スタイルについて", expanded=False):
+                        st.markdown(
+                            "- **ノンアサーティブ**：自分の意見を飲み込む／我慢する／"
+                            "言えずに後で引きずる\n"
+                            "- **アサーティブ**：自分も相手も大切にして、率直に伝える\n"
+                            "- **アグレッシブ**：自分の要求を通すため、相手を責めたり"
+                            "傷つけたりする"
+                        )
+                        st.caption(
+                            "どれが「良い／悪い」ではなく、場面ごとに使い分けがあります。"
+                            "中央のアサーティブが増えると、自分も相手も疲れにくくなります。"
+                        )
                     st.markdown("**パターン**")
                     st.write(diag.get("pattern", ""))
                     if diag.get("strengths"):
