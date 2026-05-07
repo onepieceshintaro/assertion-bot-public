@@ -4,6 +4,8 @@ from datetime import date, timedelta
 
 import pandas as pd
 
+from time_utils import today_jst
+
 
 REPORT_SYSTEM_PROMPT = """あなたは、ユーザーの1週間のアサーション記録を**冷静に振り返る**サポーターです。
 
@@ -46,7 +48,7 @@ insight と todo から特に役立ちそうなもの2〜3個を短く引用。
 
 
 def current_week_range(today: date | None = None) -> tuple[date, date]:
-    today = today or date.today()
+    today = today or today_jst()
     start = today - timedelta(days=today.weekday())
     end = start + timedelta(days=6)
     return start, end

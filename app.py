@@ -22,6 +22,7 @@ from prompts import (
 )
 from reports import current_week_range, filter_week, generate_weekly_report
 from _user import render_account_sidebar
+from time_utils import now_jst_naive, today_jst
 
 st.set_page_config(
     page_title="伝え方ノート",
@@ -239,7 +240,7 @@ if view == "💬 対話":
             label_visibility="collapsed",
             key="quick_when",
         )
-        now = datetime.now()
+        now = now_jst_naive()  # JST に統一
         if quick == "今さっき":
             event_dt = now
         elif quick == "今日":
