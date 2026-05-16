@@ -441,14 +441,29 @@ if view == "💬 対話":
 
             with st.chat_message("assistant"):
                 with st.spinner("..."):
-                    # 危機検知：キーワード＋LLMスコアリング
+                    # 危機検知：3 モード判定（normal / warning / critical）
+                    from crisis_detection import detect_mode
+                    _mode_result = detect_mode(
+                        prompt, client=anthropic_client, use_llm=True,
+                    )
+                    _mode = _mode_result["mode"]
+                    # 既存テーブルにも記録（後方互換）
                     risk_result = assess_risk(prompt)
                     save_risk_score(prompt, risk_result)
 
-                    if risk_result["triggered"]:
-                        if risk_result["level"] == "crisis":
-                            raw_reply = CRISIS_RESPONSE
-                        elif risk_result["level"] == "abuse":
+                    if _mode == "critical":
+                        from crisis_ui import render_critical_ui
+                        render_critical_ui()
+                        st.stop()
+                    elif _mode == "warning":
+                        from crisis_ui import render_warning_ui
+                        render_warning_ui(
+                            on_resume_key="assertion_warning_resume",
+                        )
+                        st.stop()
+                    elif risk_result.get("triggered"):
+                        # 既存の abuse 検出はそのまま活用（虐待アドバイザリ）
+                        if risk_result.get("level") == "abuse":
                             raw_reply = ABUSE_ADVISORY
                         else:
                             raw_reply = CRISIS_RESPONSE
